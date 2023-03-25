@@ -239,12 +239,41 @@ import torch
 from torchvision import datasets
 from torchvision.transforms import ToTensor, Lambda
 
+# ToTensor是pytorch中的一个转换函数，用于将PIL、numpy array转换为张量(floattensor)，这个转换函数还将图像的像素强度值缩放到[0, 1]内
 ds = datasets.FashionMNIST(
     root = "data1",
     train = True,
     download = True,
     transform = ToTensor(),
-    target_transform = Lambda(lambda y: torch.zeros(10, dtype=torch.float).scatter_(0, torch.tensor(y), value=1)) # 用于将y转换为one-hot向量，这里新建一个长度为10的零向量，使用scatter函数在零向量上将y对应的值设为1
-
-
+    target_transform = Lambda(lambda y: torch.zeros(10, dtype=torch.float).scatter_(0, torch.tensor(y), value=1)) # 用于将y转换为one-hot向量，这里新建一个长度为10的零向量，使用scatter函数（0表示第0维，y是要填充的索引，1是填充的值）在零向量上将对应的位置设置为1
 )
+
+# BUILD THE NEURAL NETWORK：
+# 神经网络由一系列对数据执行操作的层/模块组成。torch.nn 命名空间提供了构建自己的神经网络所需的所有构建块。在 PyTorch 中，每个模块都是 nn.Module 的子类。神经网络本身也是一个模块，它由其他模块（层）组成。这种嵌套结构使得构建和管理复杂的体系结构变得容易。
+# nn.Module 是 PyTorch 中用于定义神经网络模型的基类。继承自 nn.Module 类的子类都可以被视为一个可训练的神经网络模型，并且可以使用 PyTorch 的优化器和损失函数等工具进行训练和测试。
+import os
+import torch
+from torch import nn
+from torch.utils.data import DataLoader
+from torchvision import datasets, transforms
+
+# get device for training（获取用于训练的设备(GPU/CPU)）:
+device = "cuda" if torch.cuda.is_available() else "cpu"
+print(f"Using {device} device")
+
+# 我们可以通过继承 nn.Module 来定义神经网络，并在 init 中初始化神经网络层。每个 nn.Module 的子类实现在 forward 方法中对输入数据进行操作。
+class NeuralNetwork(nn.Module):  # 表示继承自nn.Module
+    def __init__(self):
+        super().__init__()  # 用于调用父类构造函数
+        self.flatten = nn.Flatten()
+        self.linear_relu_stack = nn.Sequential(
+            nn.Linear(28*28, 512),
+            nn.ReLU(),
+            nn.Linear(512, 512),
+            nn.ReLU(),
+            nn.Linear(512, 10),
+        )
+    def forward(self, x):
+        x = self.flatten(x)
+        logits = self.linear_relu_stack(x)
+        return logits
