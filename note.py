@@ -4,7 +4,8 @@
 #Python 3.x中print之后会自动加一个换行符，Python 2.x则不会
 #可以输出数字，字符串和表达式
 #None可以用来表示变量为零，函数无有效返回值等等
-
+#包是一种用点式模块名来区分模块的方法
+import numpy as np
 #数字：
 print(520)
 
@@ -332,3 +333,10 @@ my_list = [1, 2, 3, "apple"]
 a = np.array([[[1, 2], [3, 4], [5, 6]]]) # a有三个二维数组，每个二维数组一行两列
 # next()函数的操作对象是一个迭代器而不是可迭代数据，只有经过iter()转换的可迭代数据才可以用next()迭代，iter()并不会改变原数据
 
+# map函数用法：map(a, b)将iterable类型的 b中元素替换为a
+squares = list(map(lambda x: x**2, range(10)))
+print(squares)
+
+# 输入：input()：用于获取输入的字符串：
+age = int(input("input your age: "))
+print("Your age is " + str(age)) 
